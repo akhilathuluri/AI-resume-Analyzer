@@ -1,118 +1,184 @@
-# AI Resume Matcher - Resume Management System
+# 🚀 AI Resume Analyzer - Advanced Resume Management System
 
 [![React](https://img.shields.io/badge/React-18.3.1-blue)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5.3-blue)](https://www.typescriptlang.org/)
 [![Supabase](https://img.shields.io/badge/Supabase-2.39.0-green)](https://supabase.com/)
 [![Vite](https://img.shields.io/badge/Vite-5.4.2-purple)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-blue)](https://tailwindcss.com/)
+[![GitHub Models](https://img.shields.io/badge/GitHub_Models-GPT--4o--mini-orange)](https://github.com/features/models)
 
-A modern, AI-powered resume management system that helps recruiters and hiring managers efficiently store, analyze, and match resumes to job descriptions using advanced embedding technology and intelligent chatbot assistance.
+A cutting-edge, AI-powered resume management system that revolutionizes recruitment with intelligent candidate analysis, semantic search, and comprehensive communication tracking. Built for modern recruiters and hiring managers who demand efficiency and precision.
 
-## 🚀 Features
+## ✨ **Key Highlights**
 
-### 📁 **Resume Management**
-- **Upload & Storage**: Support for PDF and TXT resume files
-- **Cloud Storage**: Secure file storage with Supabase Storage
-- **File Organization**: Automatic file naming and organization
-- **Orphaned File Cleanup**: Smart detection and removal of orphaned database records
+- 🤖 **Direct GitHub Models Integration** - No backend required, powered by GPT-4o-mini
+- 🎯 **Advanced Semantic Search** - AI-powered resume matching with similarity scoring
+- 💬 **Intelligent Chatbot Assistant** - Natural language job description analysis
+- 📧 **Email Communication Hub** - Integrated candidate outreach with tracking
+- 🔍 **Advanced Search & Export** - Powerful search with multiple export formats
+- ⌨️ **Keyboard Navigation** - Professional productivity shortcuts
+- 📱 **Responsive Design** - Mobile-first UI with modern aesthetics
 
-### 🤖 **AI-Powered Matching**
-- **Semantic Search**: Advanced embedding-based resume matching
-- **Intelligent Analysis**: AI-powered job description analysis
-- **Similarity Scoring**: Precise matching percentage calculations
-- **Top 10 Results**: Curated list of best-matching candidates
+---
+
+## 🚀 **Core Features**
+
+### 📁 **Advanced Resume Management**
+- **Multi-Format Support**: PDF, DOCX, TXT files up to 100MB
+- **Cloud Storage**: Secure Supabase Storage with automatic backups
+- **Smart Search**: Content-based search across all resumes
+- **Bulk Operations**: Mass selection, export, and communication
+- **Orphaned File Cleanup**: Intelligent database maintenance
+- **Real-time Updates**: Live file synchronization
+- **File Validation**: Automatic content extraction and validation
+
+### 🤖 **AI-Powered Intelligence**
+- **Semantic Matching**: Advanced embedding-based resume analysis
+- **Similarity Scoring**: Precise percentage-based candidate ranking
+- **Job Description Analysis**: Natural language processing of requirements
+- **Content Extraction**: AI-powered text extraction from multiple formats
+- **Resume Parsing**: Intelligent extraction of skills, experience, and contact info
+- **GitHub Models Integration**: Direct API access to latest AI models
+- **Contextual Understanding**: Conversation history for follow-up questions
 
 ### 💬 **Smart Chatbot Assistant**
-- **Interactive Interface**: Natural language job description input
-- **Persistent Memory**: Chat history saved across sessions
-- **Markdown Formatting**: Beautifully formatted AI responses
-- **Real-time Analysis**: Instant resume matching and insights
+- **Natural Language Interface**: Conversational job description input
+- **Persistent Memory**: Complete chat history across sessions
+- **Markdown Formatting**: Rich text responses with proper formatting
+- **Resume Insights**: Detailed analysis of candidate matches
+- **Follow-up Support**: Answer questions about previous analyses
+- **Real-time Processing**: Instant matching and analysis
+- **Context Awareness**: References previous conversations and analyses
 
-### 🔐 **Authentication & Security**
-- **Supabase Auth**: Secure user authentication
-- **Row Level Security**: Protected data access
-- **Session Management**: Persistent login sessions
+### 🔍 **Advanced Search & Navigation**
+- **Message Search**: Full-text search across chat history
+- **Search Highlighting**: Visual indicators for search results
+- **Search Options**: Case-sensitive, whole words, regex support
+- **Resume Content Search**: Include resume text in searches
+- **Keyboard Navigation**: Arrow keys for message navigation
+- **Quick Access**: Ctrl+K for search, Ctrl+S for export
+- **Result Navigation**: Previous/next result with visual feedback
+
+### 📧 **Communication Hub**
+- **Email Integration**: Real email sending via EmailJS
+- **Bulk Communication**: Mass email to selected candidates
+- **Communication Tracking**: Complete audit trail of interactions
+- **Email Templates**: Professional message templates
+- **Contact Extraction**: Automatic email detection from resumes
+- **Delivery Status**: Track email success/failure
+- **Communication History**: Searchable record of all touchpoints
+
+### 📊 **Export & Reporting**
+- **Multiple Formats**: Markdown, JSON, HTML, CSV, TXT
+- **Chat Export**: Complete conversation history with metadata
+- **Resume Export**: Actual file downloads, not just metadata
+- **Bulk Export**: Mass export of selected resumes
+- **Metadata Inclusion**: Timestamps, similarity scores, analysis data
+- **Formatted Output**: Professional formatting for sharing
+- **Date Range Filtering**: Export specific time periods
+
+### ⌨️ **Productivity Features**
+- **Keyboard Shortcuts**: Professional navigation shortcuts
+- **Message Navigation**: Arrow key navigation through chat
+- **Focus Management**: Accessible focus indicators
+- **Quick Actions**: Keyboard-triggered modals and functions
+- **Search Integration**: Seamless search with navigation
+- **Accessibility**: WCAG compliant keyboard navigation
+- **Performance Optimized**: Efficient DOM manipulation
+
+### 🔐 **Security & Authentication**
+- **Supabase Auth**: Enterprise-grade authentication
+- **Row Level Security**: Database-level data protection
 - **User Isolation**: Complete data separation between users
+- **Session Management**: Secure persistent sessions
+- **Data Privacy**: No API keys exposed in frontend
+- **Secure Storage**: Encrypted file storage with access controls
 
 ### 🎨 **Modern UI/UX**
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Dark/Light Theme**: Professional color scheme
-- **Interactive Elements**: Smooth animations and transitions
-- **Accessibility**: WCAG compliant interface
+- **Responsive Design**: Mobile-first with perfect tablet/desktop scaling
+- **Glass Morphism**: Modern backdrop blur effects
+- **Micro-interactions**: Smooth animations and transitions
+- **Professional Theme**: Consistent design language
+- **Accessibility**: Screen reader support and keyboard navigation
+- **Performance**: Optimized rendering with lazy loading
+- **Dark Mode Ready**: Future-proof styling system
 
-## 🛠 Tech Stack
+---
 
-### **Frontend**
-- **React 18.3.1** - Modern React with hooks and functional components
-- **TypeScript 5.5.3** - Type-safe development
-- **Vite 5.4.2** - Lightning-fast build tool
-- **Tailwind CSS 3.4.1** - Utility-first CSS framework
-- **React Router DOM 6.22.0** - Client-side routing
+## 🛠 **Technology Stack**
+
+### **Frontend Core**
+- **React 18.3.1** - Modern hooks and concurrent features
+- **TypeScript 5.5.3** - Full type safety and IntelliSense
+- **Vite 5.4.2** - Lightning-fast development and building
+- **Tailwind CSS 3.4.1** - Utility-first responsive design
+
+### **UI & Interaction**
 - **Lucide React 0.344.0** - Beautiful icon library
+- **React Router DOM 6.22.0** - Client-side routing
+- **React Markdown** - Rich text rendering with GitHub flavored markdown
+- **PDF.js 4.0.379** - Client-side PDF processing
+- **Mammoth** - DOCX file processing
 
 ### **Backend & Database**
-- **Supabase 2.39.0** - Backend-as-a-Service
+- **Supabase 2.39.0** - Complete backend-as-a-service
 - **PostgreSQL** - Robust relational database
-- **Row Level Security** - Database-level security
-- **Real-time subscriptions** - Live data updates
+- **Real-time Engine** - Live data synchronization
+- **Storage API** - Secure file management
 
-### **AI & Processing**
-- **PDF.js 4.0.379** - PDF text extraction
-- **OpenAI Embeddings** - Text embedding generation
-- **GPT-4o-mini** - AI response generation
-- **Cosine Similarity** - Mathematical matching algorithm
+### **AI & Intelligence**
+- **GitHub Models API** - Direct access to GPT-4o-mini
+- **Text Embeddings** - Semantic similarity calculations
+- **Natural Language Processing** - Conversational AI interface
+- **Content Extraction** - Multi-format text processing
 
-### **Markdown & Formatting**
-- **React Markdown** - Rich text rendering
-- **Remark GFM** - GitHub Flavored Markdown support
+### **Communication**
+- **EmailJS** - Real email sending capabilities
+- **Email Validation** - Professional email verification
+- **Template System** - Customizable message templates
 
-## 📋 Prerequisites
+---
 
-Before you begin, ensure you have the following installed:
-- **Node.js** (v18 or higher)
-- **npm** or **yarn**
-- **Git**
+## 🚀 **Quick Start Guide**
 
-## ⚡ Quick Start
+### **Prerequisites**
+- Node.js 18+ and npm/yarn
+- Supabase account (free tier available)
+- GitHub account with Models access
 
-### 1. Clone the Repository
+### **1. Environment Setup**
 ```bash
-git clone <your-repo-url>
-cd resume-management-app
-```
+# Clone the repository
+git clone https://github.com/akhilathuluri/AI-resume-Analyzer.git
+cd AI-resume-Analyzer
 
-### 2. Install Dependencies
-```bash
+# Install dependencies
 npm install
+
+# Create environment file
+cp .env.example .env
 ```
 
-### 3. Environment Setup
-Create a `.env.local` file in the root directory:
+### **2. Environment Variables**
 ```env
+# Supabase Configuration
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_GITHUB_TOKEN=your_github_token_for_ai_models
+
+# AI Integration
+VITE_GITHUB_TOKEN=github_pat_your_token_here
+
+# Email Integration (Optional)
+VITE_EMAILJS_SERVICE_ID=your_emailjs_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_emailjs_public_key
 ```
 
-### 4. Database Setup
-Run the following SQL migrations in your Supabase SQL editor:
+### **3. Database Setup**
 
-#### Create Tables
+#### **Core Tables**
 ```sql
--- Users table (automatically created by Supabase Auth)
-
--- User storage tracking
-CREATE TABLE user_storage (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    total_files INTEGER DEFAULT 0,
-    total_size BIGINT DEFAULT 0,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(user_id)
-);
-
--- Resumes table
+-- Resume storage table
 CREATE TABLE resumes (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -125,7 +191,7 @@ CREATE TABLE resumes (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Chat messages table
+-- Chat history table
 CREATE TABLE chat_messages (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -135,205 +201,331 @@ CREATE TABLE chat_messages (
     resumes JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Communication tracking table
+CREATE TABLE communications (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    resume_id UUID REFERENCES resumes(id) ON DELETE CASCADE,
+    subject TEXT NOT NULL,
+    message TEXT NOT NULL,
+    email_sent BOOLEAN DEFAULT FALSE,
+    delivery_status TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- User storage tracking
+CREATE TABLE user_storage (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    total_files INTEGER DEFAULT 0,
+    total_size BIGINT DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id)
+);
 ```
 
-#### Enable Row Level Security
+#### **Security Policies**
 ```sql
--- Enable RLS
-ALTER TABLE user_storage ENABLE ROW LEVEL SECURITY;
+-- Enable Row Level Security
 ALTER TABLE resumes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE communications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_storage ENABLE ROW LEVEL SECURITY;
 
--- Create policies
-CREATE POLICY "Users can view own storage" ON user_storage FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own storage" ON user_storage FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own storage" ON user_storage FOR UPDATE USING (auth.uid() = user_id);
+-- Create access policies
+CREATE POLICY "Users access own data" ON resumes 
+    FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can view own resumes" ON resumes FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own resumes" ON resumes FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update own resumes" ON resumes FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can delete own resumes" ON resumes FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users access own messages" ON chat_messages 
+    FOR ALL USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can view own messages" ON chat_messages FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own messages" ON chat_messages FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can delete own messages" ON chat_messages FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users access own communications" ON communications 
+    FOR ALL USING (auth.uid() = user_id);
+
+CREATE POLICY "Users access own storage" ON user_storage 
+    FOR ALL USING (auth.uid() = user_id);
 ```
 
-### 5. Storage Setup
-Create a storage bucket named `resumes` in your Supabase project:
-1. Go to Storage in Supabase Dashboard
-2. Create new bucket: `resumes`
-3. Set as public bucket
-4. Configure RLS policies for the bucket
+### **4. Storage Configuration**
+1. Create a `resumes` bucket in Supabase Storage
+2. Set bucket to public with RLS policies
+3. Configure upload restrictions (file types, size limits)
 
-### 6. Start Development Server
+### **5. Development**
 ```bash
+# Start development server
 npm run dev
-```
 
-Visit `http://localhost:5173` to see your application running!
-
-## 📖 Usage Guide
-
-### **Getting Started**
-1. **Sign Up/Login**: Create an account or login with existing credentials
-2. **Upload Resumes**: Navigate to "Files" and upload PDF/TXT resume files
-3. **Start Chatting**: Go to "Chatbot" and describe job positions
-4. **Review Matches**: Get AI-powered analysis and top matching candidates
-
-### **File Management**
-- **Upload**: Drag & drop or click to upload resume files
-- **View**: Click the external link icon to view stored resumes
-- **Cleanup**: Use "Cleanup Orphaned Records" to remove broken references
-- **Refresh**: Update file list with latest uploads
-
-### **AI Chatbot**
-- **Job Descriptions**: Describe the position you're hiring for
-- **Get Analysis**: Receive detailed AI analysis of why resumes match
-- **View Matches**: See top 10 matching resumes with similarity scores
-- **Chat History**: All conversations are saved and persist across sessions
-- **Clear History**: Remove all chat history when needed
-
-### **Settings**
-- **Profile Management**: Update account information
-- **Preferences**: Customize application settings
-
-## 🏗 Project Structure
-
-```
-src/
-├── components/           # Reusable UI components
-│   ├── AuthForm.tsx     # Authentication form
-│   └── Layout.tsx       # Main layout wrapper
-├── contexts/            # React contexts
-│   └── AuthContext.tsx  # Authentication context
-├── lib/                 # Utility libraries
-│   └── supabase.ts      # Supabase client configuration
-├── pages/               # Main application pages
-│   ├── ChatbotPage.tsx  # AI chatbot interface
-│   ├── FilesPage.tsx    # File management
-│   └── SettingsPage.tsx # User settings
-├── App.tsx              # Root application component
-├── main.tsx            # Application entry point
-└── index.css           # Global styles
-
-supabase/
-└── migrations/         # Database migrations
-    ├── 20250626180929_dry_mouse.sql
-    ├── 20250626181444_divine_temple.sql
-    └── 20250626181515_rough_truth.sql
-```
-
-## 🔧 Configuration
-
-### **Vite Configuration** (`vite.config.ts`)
-- PDF.js worker configuration
-- Build optimizations
-- Development server settings
-
-### **Tailwind Configuration** (`tailwind.config.js`)
-- Custom color schemes
-- Responsive breakpoints
-- Component classes
-
-### **TypeScript Configuration** (`tsconfig.json`)
-- Strict type checking
-- Path aliases
-- Build targets
-
-## 🚀 Deployment
-
-### **Build for Production**
-```bash
+# Build for production
 npm run build
-```
 
-### **Preview Production Build**
-```bash
+# Preview production build
 npm run preview
 ```
 
-### **Deploy to Vercel**
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+---
 
-### **Deploy to Netlify**
-1. Build command: `npm run build`
-2. Publish directory: `dist`
-3. Set environment variables in Netlify dashboard
+## 📖 **User Guide**
 
-## 🧪 Testing
+### **Getting Started**
+1. **Sign Up**: Create account with email/password
+2. **Upload Resumes**: Drag & drop or select files (PDF/DOCX/TXT)
+3. **Start Chatting**: Navigate to Chatbot and describe job positions
+4. **Review Matches**: Analyze AI-powered candidate recommendations
+5. **Communicate**: Send emails and track communications
 
-### **Run Linting**
-```bash
-npm run lint
-```
+### **Advanced Features**
 
-### **Type Checking**
-```bash
-npx tsc --noEmit
-```
+#### **Smart Search**
+- **Basic Search**: Type keywords in search bar
+- **Advanced Options**: Use case-sensitive, whole words, or regex
+- **Resume Content**: Include resume text in search results
+- **Navigation**: Use arrow keys to navigate results
 
-## 🤝 Contributing
+#### **Keyboard Shortcuts**
+- `Ctrl + K` - Open message search
+- `Ctrl + S` - Open export dialog
+- `Escape` - Close modals/search
+- `Arrow Keys` - Navigate messages/results
+- `Enter` - Start message navigation mode
 
-We welcome contributions! Please follow these steps:
+#### **Export Options**
+- **Markdown**: Best for documentation and sharing
+- **JSON**: Complete data with metadata for backup
+- **HTML**: Web-ready format with styling
+- **CSV**: Spreadsheet analysis format
+- **TXT**: Simple, universal text format
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit changes**: `git commit -m 'Add amazing feature'`
-4. **Push to branch**: `git push origin feature/amazing-feature`
-5. **Open a Pull Request**
-
-### **Development Guidelines**
-- Follow TypeScript best practices
-- Use Tailwind CSS for styling
-- Write descriptive commit messages
-- Add comments for complex logic
-- Test thoroughly before submitting
-
-## 🐛 Troubleshooting
-
-### **Common Issues**
-
-#### **PDF.js Worker Error**
-```
-Error: Setting up fake worker failed
-```
-**Solution**: The app uses CDN-hosted PDF.js worker. Ensure internet connectivity.
-
-#### **Supabase Connection Issues**
-```
-Error: Invalid API key
-```
-**Solution**: Check your `.env.local` file and ensure correct Supabase credentials.
-
-#### **File Upload Failures**
-```
-Error: Storage bucket not found
-```
-**Solution**: Create `resumes` bucket in Supabase Storage with proper RLS policies.
-
-#### **AI Model Rate Limits**
-```
-Error: Rate limit exceeded
-```
-**Solution**: Check your GitHub token limits or implement request throttling.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the for details.
-
-## 🙏 Acknowledgments
-
-- **Supabase Team** - For the amazing BaaS platform
-- **OpenAI** - For powerful AI models and embeddings
-- **Vercel** - For the excellent React and Vite tooling
-- **Tailwind Labs** - For the beautiful CSS framework
-
+#### **Bulk Operations**
+1. Select multiple resumes using checkboxes
+2. Choose bulk action (export, communicate, delete)
+3. Configure action parameters
+4. Execute with progress tracking
 
 ---
 
-**Made with ❤️ by Athuluri Akhil**
+## 🏗 **Project Architecture**
 
-*AI Resume Matcher - Revolutionizing recruitment with artificial intelligence*
+```
+src/
+├── components/              # Reusable UI components
+│   ├── AIDiagnostics.tsx    # AI service testing
+│   ├── AuthForm.tsx         # Authentication form
+│   ├── DatabaseDebugger.tsx # Development debugging
+│   ├── ErrorBoundary.tsx    # Error handling
+│   ├── Layout.tsx           # Main layout wrapper
+│   └── ResumeMatchingTester.tsx # Resume matching test tool
+├── contexts/                # React contexts
+│   └── AuthContext.tsx      # Authentication state
+├── hooks/                   # Custom React hooks
+│   ├── useChatbot.ts        # Chatbot state management
+│   ├── useExport.ts         # Export functionality
+│   ├── useKeyboardNavigation.ts # Keyboard shortcuts
+│   ├── useLoadingStates.ts  # Loading state management
+│   └── useMessageSearch.ts  # Message search functionality
+├── lib/                     # Utility libraries
+│   ├── emailServiceBrowser.ts # Email integration
+│   └── supabase.ts          # Supabase client
+├── pages/                   # Main application pages
+│   ├── ChatbotPage.tsx      # AI chatbot interface
+│   ├── FilesPage.tsx        # File management
+│   ├── HomePage.tsx         # Landing page
+│   └── SettingsPage.tsx     # User settings
+├── services/                # Business logic services
+│   ├── aiService.ts         # AI API integration
+│   ├── cacheService.ts      # Caching layer
+│   ├── chatCompletionService.ts # Chat AI logic
+│   ├── chatHistoryService.ts # Chat persistence
+│   ├── emailService.ts      # Email sending
+│   └── resumeMatchingService.ts # Resume matching logic
+├── utils/                   # Utility functions
+│   ├── retryUtils.ts        # Retry mechanisms
+│   └── validation.ts        # Input validation
+├── config/                  # Configuration files
+│   └── appConfig.ts         # Application constants
+├── App.tsx                  # Root component
+├── main.tsx                 # Application entry
+└── index.css               # Global styles with animations
+```
+
+### **Key Design Patterns**
+- **Service Layer**: Separation of business logic from UI
+- **Custom Hooks**: Reusable stateful logic
+- **Error Boundaries**: Graceful error handling
+- **Context Providers**: Global state management
+- **Type Safety**: Comprehensive TypeScript coverage
+
+---
+
+## 🚀 **Deployment Guide**
+
+### **Vercel Deployment**
+```bash
+# Build the project
+npm run build
+
+# Deploy to Vercel
+npm install -g vercel
+vercel --prod
+```
+
+**Environment Variables in Vercel:**
+- Set all `VITE_*` variables in Vercel dashboard
+- Configure build command: `npm run build`
+- Set output directory: `dist`
+
+### **Netlify Deployment**
+```bash
+# Build command
+npm run build
+
+# Publish directory
+dist
+```
+
+**Deploy Settings:**
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Node version: 18.x
+
+### **Self-Hosted Deployment**
+```bash
+# Build for production
+npm run build
+
+# Serve static files
+npm install -g serve
+serve -s dist -l 3000
+```
+
+---
+
+## 🧪 **Testing & Development**
+
+### **Development Tools**
+```bash
+# Type checking
+npx tsc --noEmit
+
+# Linting
+npm run lint
+
+# Development server with HMR
+npm run dev
+```
+
+### **AI Service Testing**
+- Use AIDiagnostics component for AI service health checks
+- Test resume matching with ResumeMatchingTester
+- Monitor console for embedding generation status
+- Verify GitHub token configuration
+
+### **Database Debugging**
+- DatabaseDebugger component for data inspection
+- Test resume matching algorithms
+- Verify embedding generation and storage
+- Monitor Supabase real-time connections
+
+---
+
+## 🔧 **Configuration**
+
+### **AI Service Configuration**
+The app uses GitHub Models API for AI functionality:
+```typescript
+// Always uses direct GitHub API integration
+export const aiService = new FallbackAIService();
+```
+
+### **Customization Options**
+- **Theme**: Modify Tailwind configuration
+- **AI Models**: Update model names in aiService
+- **File Limits**: Adjust upload size limits
+- **Search Options**: Configure search algorithms
+- **Export Formats**: Add new export types
+
+---
+
+## 🐛 **Troubleshooting**
+
+### **Common Issues**
+
+#### **AI Service Errors**
+```
+Error: GitHub token authentication failed
+```
+**Solution**: Check VITE_GITHUB_TOKEN format and permissions
+
+#### **File Upload Issues**
+```
+Error: File upload failed
+```
+**Solution**: Verify Supabase storage bucket configuration and RLS policies
+
+#### **Search Not Working**
+```
+Search results not appearing
+```
+**Solution**: Check message indexing and search query formatting
+
+#### **Email Sending Failures**
+```
+EmailJS configuration error
+```
+**Solution**: Verify EmailJS service ID, template ID, and public key
+
+### **Performance Optimization**
+- Enable lazy loading for large file lists
+- Implement virtual scrolling for chat history
+- Use React.memo for expensive components
+- Optimize embedding calculations with caching
+
+---
+
+## 🤝 **Contributing**
+
+### **Development Setup**
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Install dependencies: `npm install`
+4. Set up environment variables
+5. Start development server: `npm run dev`
+
+### **Code Standards**
+- Follow TypeScript strict mode
+- Use ESLint and Prettier configurations
+- Write descriptive commit messages
+- Add JSDoc comments for complex functions
+- Maintain test coverage for critical features
+
+### **Pull Request Process**
+1. Update documentation for new features
+2. Add tests for bug fixes
+3. Ensure all linting passes
+4. Update version numbers appropriately
+5. Request review from maintainers
+
+---
+
+## 📄 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 **Acknowledgments**
+
+- **Supabase Team** - For the incredible backend platform
+- **GitHub** - For Models API access and hosting
+- **OpenAI** - For the foundational AI models
+- **Vercel** - For seamless deployment experience
+- **Tailwind Labs** - For the beautiful CSS framework
+- **React Team** - For the amazing frontend library
+
+---
+
+**🚀 AI Resume Analyzer - Transforming recruitment with artificial intelligence**
+
+*Built with ❤️ for modern recruiters and hiring teams*
