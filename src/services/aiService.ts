@@ -50,7 +50,9 @@ class AIService {
   private baseUrl: string;
 
   constructor() {
-    // In production, this would point to your backend API
+    // NOTE: This baseUrl is only used by AIService (backend API calls)
+    // Since we're using FallbackAIService, this constructor is never called
+    // Keeping for future backend integration possibility
     this.baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
   }
 
@@ -469,6 +471,6 @@ class FallbackAIService extends AIService {
 }
 
 // Export singleton instance
-export const aiService = import.meta.env.PROD 
-  ? new AIService() 
-  : new FallbackAIService();
+// For now, always use FallbackAIService for both development and production
+// This ensures consistent behavior and direct GitHub Models API integration
+export const aiService = new FallbackAIService();
