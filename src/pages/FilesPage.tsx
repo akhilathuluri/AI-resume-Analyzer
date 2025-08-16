@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react'
-import { Upload, File, Trash2, Eye, Search, RefreshCw, Mail, MessageSquare, FileDown, Users, Zap } from 'lucide-react'
+import { Upload, File, Trash2, Eye, Search, RefreshCw, Mail, MessageSquare, FileDown, Users, Zap, Folder, FolderPlus, ChevronRight, Home } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { sendBulkEmail, extractEmailFromContent, validateEmail, type EmailResult } from '../lib/emailServiceBrowser'
@@ -21,6 +21,17 @@ interface Resume {
   content?: string
   embedding?: number[] | null
   has_content?: boolean // Flag to indicate if content exists without loading it
+  folder_id?: string | null
+}
+
+interface Folder {
+  id: string
+  name: string
+  path: string
+  parent_folder_id: string | null
+  user_id: string
+  created_at: string
+  updated_at: string
 }
 
 export function FilesPage() {
@@ -33,6 +44,14 @@ export function FilesPage() {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [dragActive, setDragActive] = useState(false)
   const [notification, setNotification] = useState<{message: string, type: 'success' | 'error' | 'info'} | null>(null)
+  
+  // Folder-related state
+  const [folders, setFolders] = useState<Folder[]>([])
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null)
+  const [currentFolderPath, setCurrentFolderPath] = useState<string[]>(['Home'])
+  const [showCreateFolder, setShowCreateFolder] = useState(false)
+  const [newFolderName, setNewFolderName] = useState('')
+  const [creatingFolder, setCreatingFolder] = useState(false)
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -72,8 +91,169 @@ export function FilesPage() {
     setTimeout(() => setNotification(null), 3000)
   }
 
+  // Folder operations
+  const fetchFolders = useCallback(async () => {
+    if (!user) return
+
+    try {
+      let query = supabase
+        .from('folders')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('name', { ascending: true })
+
+      // Handle null parent_folder_id correctly
+      if (currentFolderId === null) {
+        query = query.is('parent_folder_id', null)
+      } else {
+        query = query.eq('parent_folder_id', currentFolderId)
+      }
+
+      const { data, error } = await query
+
+      if (error) throw error
+      setFolders(data || [])
+    } catch (error) {
+      console.error('Error fetching folders:', error)
+      showNotification('Error loading folders', 'error')
+    }
+  }, [user, currentFolderId])
+
+  // Create new folder
+  const createFolder = async () => {
+    if (!user || !newFolderName.trim()) return
+
+    setCreatingFolder(true)
+    try {
+      const folderPath = currentFolderPath.length > 1 
+        ? `${currentFolderPath.slice(1).join('/')}/${newFolderName.trim()}`
+        : newFolderName.trim()
+
+      const { error } = await supabase
+        .from('folders')
+        .insert([{
+          name: newFolderName.trim(),
+          path: folderPath,
+          parent_folder_id: currentFolderId,
+          user_id: user.id
+        }])
+
+      if (error) throw error
+
+      await fetchFolders()
+      setNewFolderName('')
+      setShowCreateFolder(false)
+      showNotification('Folder created successfully', 'success')
+    } catch (error) {
+      console.error('Error creating folder:', error)
+      showNotification('Error creating folder', 'error')
+    } finally {
+      setCreatingFolder(false)
+    }
+  }
+
+  // Navigate into folder
+  const navigateToFolder = (folder: Folder) => {
+    setCurrentFolderId(folder.id)
+    setCurrentFolderPath(prev => [...prev, folder.name])
+    setCurrentPage(1) // Reset to first page when navigating
+  }
+
+  // Navigate to parent folder or home
+  const navigateBack = () => {
+    if (currentFolderPath.length <= 1) {
+      setCurrentFolderId(null)
+      setCurrentFolderPath(['Home'])
+    } else {
+      setCurrentFolderId(null) // Will be set correctly by finding parent
+      setCurrentFolderPath(prev => prev.slice(0, -1))
+      
+      // If not at root, find the parent folder
+      if (currentFolderPath.length > 2) {
+        const parentPath = currentFolderPath.slice(1, -1).join('/')
+        const parentFolder = folders.find(f => f.path === parentPath)
+        if (parentFolder) {
+          setCurrentFolderId(parentFolder.id)
+        }
+      }
+    }
+    setCurrentPage(1) // Reset to first page when navigating
+  }
+
+  // Navigate to specific breadcrumb level
+  const navigateToBreadcrumb = (index: number) => {
+    if (index === 0) {
+      setCurrentFolderId(null)
+      setCurrentFolderPath(['Home'])
+    } else {
+      // For now, we'll implement a simpler version that just goes back step by step
+      const newPath = currentFolderPath.slice(0, index + 1)
+      setCurrentFolderPath(newPath)
+      
+      if (newPath.length > 1) {
+        // This would require a more complex lookup - for now keeping it simple
+        setCurrentFolderId(null) // Will be properly handled when we implement folder lookup
+      } else {
+        setCurrentFolderId(null)
+      }
+    }
+    setCurrentPage(1) // Reset to first page when navigating
+  }
+
+  // Delete folder (only if empty)
+  const deleteFolder = async (folderId: string, folderName: string) => {
+    if (!confirm(`Are you sure you want to delete the folder "${folderName}"? This will only work if the folder is empty.`)) {
+      return
+    }
+
+    try {
+      // Check if folder has any resumes
+      const { data: resumesInFolder, error: resumeCheckError } = await supabase
+        .from('resumes')
+        .select('id')
+        .eq('folder_id', folderId)
+        .limit(1)
+
+      if (resumeCheckError) throw resumeCheckError
+
+      if (resumesInFolder && resumesInFolder.length > 0) {
+        showNotification('Cannot delete folder that contains resumes. Move or delete the resumes first.', 'error')
+        return
+      }
+
+      // Check if folder has subfolders
+      const { data: subfolders, error: subfolderCheckError } = await supabase
+        .from('folders')
+        .select('id')
+        .eq('parent_folder_id', folderId)
+        .limit(1)
+
+      if (subfolderCheckError) throw subfolderCheckError
+
+      if (subfolders && subfolders.length > 0) {
+        showNotification('Cannot delete folder that contains subfolders. Delete the subfolders first.', 'error')
+        return
+      }
+
+      // Delete the folder
+      const { error } = await supabase
+        .from('folders')
+        .delete()
+        .eq('id', folderId)
+
+      if (error) throw error
+
+      await fetchFolders()
+      showNotification('Folder deleted successfully', 'success')
+    } catch (error) {
+      console.error('Error deleting folder:', error)
+      showNotification('Error deleting folder', 'error')
+    }
+  }
+
   // Add caching and prevent unnecessary refetches
   const lastFetchTime = useRef<number>(0)
+  const currentFolderRef = useRef<string | null>(currentFolderId)
   const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes cache
   
   // PERFORMANCE OPTIMIZATION: Only fetch essential fields to prevent timeout errors
@@ -84,9 +264,11 @@ export function FilesPage() {
     const now = Date.now()
     const timeSinceLastFetch = now - lastFetchTime.current
 
+    console.log(`[fetchResumes] Called with forceRefresh=${forceRefresh}, folder=${currentFolderId}, timeSinceLastFetch=${timeSinceLastFetch}ms`)
+
     // Skip fetch if data is fresh and not forced
     if (!forceRefresh && timeSinceLastFetch < CACHE_DURATION && resumes.length > 0) {
-      console.log('Using cached resume data')
+      console.log('[fetchResumes] Using cached resume data')
       return
     }
 
@@ -96,8 +278,8 @@ export function FilesPage() {
     }
     
     try {
-      // Fetch essential fields first, including embedding status
-      const { data, error } = await supabase
+      // Fetch essential fields first, including embedding status and folder_id
+      let query = supabase
         .from('resumes')
         .select(`
           id,
@@ -108,10 +290,19 @@ export function FilesPage() {
           created_at,
           updated_at,
           user_id,
-          embedding
+          embedding,
+          folder_id
         `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+
+      // Filter by current folder
+      if (currentFolderId) {
+        query = query.eq('folder_id', currentFolderId)
+      } else {
+        query = query.is('folder_id', null)
+      }
+
+      const { data, error } = await query.order('created_at', { ascending: false })
 
       if (error) throw error
       
@@ -126,7 +317,8 @@ export function FilesPage() {
         updated_at: resume.updated_at,
         user_id: resume.user_id,
         content: '', // Will be loaded on-demand for UI
-        embedding: resume.embedding
+        embedding: resume.embedding,
+        folder_id: resume.folder_id
       }))
       
       setResumes(resumesWithStatus)
@@ -142,37 +334,7 @@ export function FilesPage() {
     } finally {
       setLoading(false)
     }
-  }, [user, resumes.length])
-
-  // Lazy load content and embedding for specific resume when needed
-  const loadResumeContent = useCallback(async (resumeId: string) => {
-    if (!user) return null
-
-    try {
-      const { data, error } = await supabase
-        .from('resumes')
-        .select('content, embedding')
-        .eq('id', resumeId)
-        .eq('user_id', user.id)
-        .single()
-
-      if (error) throw error
-      
-      // Update the specific resume in state with content and embedding
-      setResumes(prevResumes => 
-        prevResumes.map(resume => 
-          resume.id === resumeId 
-            ? { ...resume, content: data.content, embedding: data.embedding }
-            : resume
-        )
-      )
-      
-      return data
-    } catch (error) {
-      console.error('Error loading resume content:', error)
-      return null
-    }
-  }, [user])
+  }, [user, currentFolderId]) // Removed resumes.length to prevent infinite loop
 
   // Batch load content for multiple resumes (useful for bulk operations)
   const loadMultipleResumeContent = useCallback(async (resumeIds: string[]) => {
@@ -492,14 +654,22 @@ export function FilesPage() {
 
   useEffect(() => {
     const initializeData = async () => {
+      const folderChanged = currentFolderRef.current !== currentFolderId
+      currentFolderRef.current = currentFolderId
+      
       // Only cleanup and fetch if we don't have recent data
       if (resumes.length === 0 || Date.now() - lastFetchTime.current > CACHE_DURATION) {
         await cleanupOrphanedRecords()
         await fetchResumes(false) // Use cache if available
+      } else if (folderChanged) {
+        // If folder changed but we have fresh data, force refresh for new folder
+        await fetchResumes(true) // Force refresh only when folder changes
       }
+      // Always fetch folders for current directory  
+      await fetchFolders()
     }
     initializeData()
-  }, [fetchResumes, user, resumes.length])
+  }, [fetchResumes, fetchFolders, user, currentFolderId])
 
   // Check for data consistency when component becomes visible
   useEffect(() => {
@@ -942,7 +1112,6 @@ export function FilesPage() {
       }
 
       // Upload file to Supabase storage
-      const fileExt = file.name.split('.').pop()
       // Create a unique filename while preserving the original name
       const timestamp = Date.now()
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_').replace(/_{2,}/g, '_')
@@ -981,13 +1150,14 @@ export function FilesPage() {
                   file_type: 'text/plain', // Store as text type
                   content,
                   embedding: embedding.length > 0 ? embedding : null, // Only set embedding if valid
+                  folder_id: currentFolderId, // Associate with current folder
                 },
               ])
 
             if (dbError) throw dbError
 
             await updateStorageStats()
-            fetchResumes()
+            fetchResumes(true) // Force refresh after upload
             showNotification(`Successfully saved text content from ${file.name} (file not stored)`, 'success')
             return
           } else {
@@ -1018,6 +1188,7 @@ export function FilesPage() {
             file_type: file.type,
             content,
             embedding: embedding.length > 0 ? embedding : null, // Only set embedding if valid
+            folder_id: currentFolderId, // Associate with current folder
           },
         ])
 
@@ -1046,6 +1217,7 @@ export function FilesPage() {
                 file_type: file.type,
                 content,
                 embedding: null, // Explicitly set to null
+                folder_id: currentFolderId, // Associate with current folder
               },
             ])
           
@@ -2102,8 +2274,9 @@ export function FilesPage() {
       resume.filename.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     )
     
-    // Update total pages when filtered data changes
-    const newTotalPages = Math.ceil(filtered.length / itemsPerPage)
+    // Update total pages when filtered data changes (folders + resumes)
+    const totalItems = folders.length + filtered.length
+    const newTotalPages = Math.ceil(totalItems / itemsPerPage)
     setTotalPages(newTotalPages)
     
     // Reset to page 1 if current page is beyond available pages
@@ -2112,14 +2285,25 @@ export function FilesPage() {
     }
     
     return filtered
-  }, [resumes, debouncedSearchTerm, itemsPerPage, currentPage])
+  }, [resumes, folders.length, debouncedSearchTerm, itemsPerPage, currentPage])
 
-  // Get paginated resumes for current page
-  const paginatedResumes = useMemo(() => {
+  // Get paginated items (folders + resumes) for current page
+  const paginatedItems = useMemo(() => {
+    // Combine folders and resumes, with folders first
+    const allItems = [...folders, ...filteredResumes]
     const startIndex = (currentPage - 1) * itemsPerPage
     const endIndex = startIndex + itemsPerPage
-    return filteredResumes.slice(startIndex, endIndex)
-  }, [filteredResumes, currentPage, itemsPerPage])
+    return allItems.slice(startIndex, endIndex)
+  }, [folders, filteredResumes, currentPage, itemsPerPage])
+
+  // Separate folders and resumes from paginated items
+  const paginatedFolders = useMemo(() => {
+    return paginatedItems.filter(item => 'path' in item) as Folder[]
+  }, [paginatedItems])
+
+  const paginatedResumes = useMemo(() => {
+    return paginatedItems.filter(item => 'filename' in item) as Resume[]
+  }, [paginatedItems])
 
   // Pagination handlers
   const goToPage = useCallback((page: number) => {
@@ -2148,21 +2332,94 @@ export function FilesPage() {
     setCurrentPage(1) // Reset to first page
   }, [])
 
+  // Memoize folder and resume cards to prevent blinking during scroll
+  const folderCards = useMemo(() => {
+    return paginatedFolders.map((folder, index) => (
+      <div
+        key={`folder-${folder.id}-${folder.name}`}
+        className="folder-card group relative overflow-hidden bg-gradient-to-br from-amber-50/80 to-orange-50/80 backdrop-blur-sm border border-amber-200/60 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 hover:scale-[1.02] animate-fade-in-scale cursor-pointer"
+        style={{ 
+          animationDelay: `${Math.min(index * 50, 1000)}ms`,
+          transform: 'translateZ(0)'
+        }}
+        onClick={() => navigateToFolder(folder)}
+      >
+        <div className="relative p-6">
+          {/* Header with Folder Icon */}
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center space-x-3 flex-1 min-w-0">
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg">
+                <Folder className="h-5 w-5 text-white" />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-slate-900 truncate group-hover:text-amber-700 transition-colors">
+                  {folder.name}
+                </h3>
+                <div className="flex items-center space-x-2 mt-1">
+                  <span className="text-xs text-slate-500 font-medium">
+                    📁 Folder
+                  </span>
+                  <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                  <span className="text-xs text-slate-500 font-medium">
+                    {new Date(folder.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Delete button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                deleteFolder(folder.id, folder.name)
+              }}
+              className="opacity-0 group-hover:opacity-100 w-8 h-8 bg-red-100/80 hover:bg-red-200/80 rounded-lg flex items-center justify-center text-red-600 hover:text-red-800 transition-all duration-200"
+              title="Delete folder"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Folder Badge */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <span className="inline-flex items-center px-2.5 py-1 bg-amber-100/80 text-amber-700 text-xs font-medium rounded-lg">
+              📂 Folder
+            </span>
+          </div>
+
+          {/* Hover Indicator */}
+          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <div className="flex items-center text-xs text-amber-600 font-medium">
+              <span>Open</span>
+              <ChevronRight className="h-3 w-3 ml-1" />
+            </div>
+          </div>
+        </div>
+        
+        {/* Hover Effect Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-orange-500/0 group-hover:from-amber-500/5 group-hover:to-orange-500/5 rounded-2xl transition-all duration-300 pointer-events-none"></div>
+      </div>
+    ))
+  }, [paginatedFolders, navigateToFolder, deleteFolder])
+
   // Memoize resume cards to prevent blinking during scroll
   const resumeCards = useMemo(() => {
-    return paginatedResumes.map((resume, index) => (
-      <div
-        key={`resume-${resume.id}-${resume.filename}`} // Stable key to prevent re-mounting
-        className={`resume-card group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:scale-[1.02] animate-fade-in-scale ${
-          selectedResumes.includes(resume.id) 
-            ? 'ring-2 ring-blue-500/60 bg-blue-50/50' 
-            : ''
-        }`}
-        style={{ 
-          animationDelay: `${Math.min(index * 50, 1000)}ms`, // Cap animation delay
-          transform: 'translateZ(0)' // Force hardware acceleration
-        }}
-      >
+    return paginatedResumes.map((resume, index) => {
+      const adjustedIndex = index + paginatedFolders.length // Adjust animation delay after folders
+      return (
+        <div
+          key={`resume-${resume.id}-${resume.filename}`} // Stable key to prevent re-mounting
+          className={`resume-card group relative overflow-hidden bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-sm hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:scale-[1.02] animate-fade-in-scale ${
+            selectedResumes.includes(resume.id) 
+              ? 'ring-2 ring-blue-500/60 bg-blue-50/50' 
+              : ''
+          }`}
+          style={{ 
+            animationDelay: `${Math.min(adjustedIndex * 50, 1000)}ms`, // Cap animation delay
+            transform: 'translateZ(0)' // Force hardware acceleration
+          }}
+        >
         {/* Selection Overlay */}
         {selectedResumes.includes(resume.id) && (
           <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-indigo-500/5 rounded-2xl"></div>
@@ -2266,8 +2523,9 @@ export function FilesPage() {
         {/* Hover Effect Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-indigo-500/0 group-hover:from-blue-500/5 group-hover:to-indigo-500/5 rounded-2xl transition-all duration-300 pointer-events-none"></div>
       </div>
-    ))
-  }, [paginatedResumes, selectedResumes, toggleResumeSelection, regenerateEmbedding, viewResume, deleteResume, formatFileSize])
+    )
+    })
+  }, [paginatedResumes, paginatedFolders.length, selectedResumes, toggleResumeSelection, regenerateEmbedding, viewResume, deleteResume, formatFileSize])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-indigo-50/10">
@@ -2520,6 +2778,127 @@ export function FilesPage() {
           </div>
         </div>
 
+        {/* Breadcrumb Navigation */}
+        <div className="relative overflow-hidden bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl shadow-blue-500/10 mb-6">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-slate-50/30"></div>
+          
+          <div className="relative p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <nav className="flex items-center space-x-2 flex-1">
+                <div className="flex items-center space-x-2 text-sm">
+                  {currentFolderPath.map((pathItem, index) => (
+                    <React.Fragment key={index}>
+                      {index > 0 && <ChevronRight className="h-4 w-4 text-slate-400" />}
+                      <button
+                        onClick={() => index < currentFolderPath.length - 1 ? navigateToBreadcrumb(index) : undefined}
+                        className={`flex items-center px-3 py-1.5 rounded-xl transition-all duration-200 ${
+                          index === currentFolderPath.length - 1
+                            ? 'bg-blue-100/80 text-blue-700 font-semibold'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 font-medium'
+                        }`}
+                        disabled={index === currentFolderPath.length - 1}
+                      >
+                        {index === 0 ? (
+                          <>
+                            <Home className="h-4 w-4 mr-1.5" />
+                            Home
+                          </>
+                        ) : (
+                          <>
+                            <Folder className="h-4 w-4 mr-1.5" />
+                            {pathItem}
+                          </>
+                        )}
+                      </button>
+                    </React.Fragment>
+                  ))}
+                </div>
+              </nav>
+              
+              <div className="flex items-center space-x-2">
+                {currentFolderPath.length > 1 && (
+                  <button
+                    onClick={navigateBack}
+                    className="inline-flex items-center px-3 py-2 bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900 font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+                  >
+                    <ChevronRight className="h-4 w-4 mr-1 rotate-180" />
+                    <span className="text-sm">Back</span>
+                  </button>
+                )}
+                
+                <button
+                  onClick={() => setShowCreateFolder(true)}
+                  className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  <FolderPlus className="h-4 w-4 mr-1.5" />
+                  <span className="text-sm">New Folder</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Create Folder Modal */}
+        {showCreateFolder && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="relative overflow-hidden bg-white/95 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-2xl shadow-blue-500/20 p-6 max-w-md w-full mx-4">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-slate-50/30"></div>
+              
+              <div className="relative">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-slate-900">Create New Folder</h3>
+                  <button
+                    onClick={() => {
+                      setShowCreateFolder(false)
+                      setNewFolderName('')
+                    }}
+                    className="w-8 h-8 bg-slate-100/80 hover:bg-slate-200/80 rounded-lg flex items-center justify-center text-slate-600 hover:text-slate-800 transition-all duration-200"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Folder Name
+                    </label>
+                    <input
+                      type="text"
+                      value={newFolderName}
+                      onChange={(e) => setNewFolderName(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && !creatingFolder && newFolderName.trim() && createFolder()}
+                      placeholder="Enter folder name..."
+                      className="w-full px-4 py-3 bg-white/80 border border-slate-200/60 hover:border-slate-300/80 focus:border-blue-500/60 rounded-2xl shadow-sm hover:shadow-md focus:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-500/20 transition-all duration-300 placeholder-slate-500 text-slate-900 font-medium"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div className="flex justify-end space-x-3 pt-2">
+                    <button
+                      onClick={() => {
+                        setShowCreateFolder(false)
+                        setNewFolderName('')
+                      }}
+                      disabled={creatingFolder}
+                      className="px-4 py-2 bg-white/80 hover:bg-white border border-slate-200/60 hover:border-slate-300/80 text-slate-700 hover:text-slate-900 font-medium rounded-xl shadow-sm hover:shadow-md transition-all duration-300 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={createFolder}
+                      disabled={!newFolderName.trim() || creatingFolder}
+                      className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                    >
+                      {creatingFolder ? 'Creating...' : 'Create Folder'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Enhanced Upload Area */}
         <div className="relative overflow-hidden bg-white/80 backdrop-blur-md border border-slate-200/60 rounded-3xl shadow-xl shadow-blue-500/10 mb-8">
           <div className="absolute inset-0 bg-gradient-to-br from-white/90 to-slate-50/30"></div>
@@ -2692,7 +3071,7 @@ export function FilesPage() {
           
           <div className="relative p-6 sm:p-8">
             {/* Selection Controls */}
-            {filteredResumes.length > 0 && (
+            {(filteredResumes.length > 0 || folders.length > 0) && (
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 pb-6 border-b border-slate-200/60">
                 <div className="flex items-center space-x-4 mb-4 sm:mb-0">
                   <button
@@ -2707,7 +3086,7 @@ export function FilesPage() {
                     ) : (
                       <>
                         <input type="checkbox" checked={false} className="mr-2 rounded" readOnly />
-                        Select All ({filteredResumes.length})
+                        Select All ({filteredResumes.length} resumes)
                       </>
                     )}
                   </button>
@@ -2738,13 +3117,13 @@ export function FilesPage() {
                 <div className="text-sm text-slate-600 font-medium">
                   {totalPages > 0 ? (
                     <>
-                      Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, filteredResumes.length)} of {filteredResumes.length} resumes
+                      Showing {((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, folders.length + filteredResumes.length)} of {folders.length + filteredResumes.length} items
                       {debouncedSearchTerm && <span className="text-blue-600"> (filtered)</span>}
                       {totalPages > 1 && <span className="text-slate-500"> • Page {currentPage} of {totalPages}</span>}
                     </>
                   ) : (
                     <>
-                      {filteredResumes.length} of {resumes.length} resumes
+                      {folders.length + filteredResumes.length} total items
                       {debouncedSearchTerm && <span className="text-blue-600"> (filtered)</span>}
                     </>
                   )}
@@ -2769,7 +3148,7 @@ export function FilesPage() {
                 <div className="text-lg font-semibold text-slate-700">Loading resumes...</div>
                 <div className="text-sm text-slate-500 mt-1">Please wait while we fetch your data</div>
               </div>
-            ) : filteredResumes.length === 0 ? (
+            ) : filteredResumes.length === 0 && folders.length === 0 ? (
               <div className="text-center py-16">
                 <div className="relative inline-flex items-center justify-center mb-6">
                   <div className="absolute inset-0 bg-gradient-to-br from-slate-500/10 to-slate-600/10 rounded-2xl blur-lg"></div>
@@ -2778,12 +3157,12 @@ export function FilesPage() {
                   </div>
                 </div>
                 <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                  {debouncedSearchTerm ? 'No matching resumes found' : 'No resumes yet'}
+                  {debouncedSearchTerm ? 'No matching items found' : 'No content yet'}
                 </h3>
                 <p className="text-slate-500 font-medium mb-6 max-w-sm mx-auto">
                   {debouncedSearchTerm 
-                    ? `Try adjusting your search term "${debouncedSearchTerm}" or clear the filter to see all resumes.`
-                    : 'Upload your first resume to start building your candidate database.'
+                    ? `Try adjusting your search term "${debouncedSearchTerm}" or clear the filter to see all content.`
+                    : 'Create folders or upload resumes to start organizing your candidate database.'
                   }
                 </p>
                 {debouncedSearchTerm && (
@@ -2798,6 +3177,7 @@ export function FilesPage() {
             ) : (
               <>
                 <div className="resume-grid grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {folderCards}
                   {resumeCards}
                 </div>
 
@@ -2807,7 +3187,7 @@ export function FilesPage() {
                     <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
                       {/* Page Info */}
                       <div className="text-sm text-slate-600 font-medium">
-                        Page {currentPage} of {totalPages} ({filteredResumes.length} total results)
+                        Page {currentPage} of {totalPages} ({folders.length + filteredResumes.length} total items)
                       </div>
 
                       {/* Pagination Buttons */}
